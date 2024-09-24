@@ -31,9 +31,14 @@ export const updateFlow = async (
   res: Response
 ): Promise<Response> => {
   const { companyId } = req.user;
-  const { flowIdWelcome, flowIdPhrase } = req.body;
+  const { flowIdWelcome, flowIdPhrase, flowPhrase } = req.body;
 
-  const flow = await UpdateFlowDefaultService({ companyId, flowIdWelcome, flowIdPhrase });
+  const flow = await UpdateFlowDefaultService({
+    companyId,
+    flowIdWelcome,
+    flowIdPhrase,
+    flowPhrase
+  });
 
   return res.status(200).json(flow);
 };

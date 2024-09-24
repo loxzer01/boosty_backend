@@ -3,6 +3,7 @@ import GetWhatsappWbot from "./GetWhatsappWbot";
 import fs from "fs";
 
 import { getMessageOptions } from "../services/WbotServices/SendWhatsAppMedia";
+import { AnyMessageContent } from "@whiskeysockets/baileys";
 
 export type MessageData = {
   number: number | string;
@@ -10,7 +11,7 @@ export type MessageData = {
   mediaPath?: string;
 };
 
-export const SendMessageFlow = async (  
+export const SendMessageFlow = async (
   whatsapp: Whatsapp,
   messageData: MessageData,
   isFlow: boolean = false,
@@ -23,14 +24,29 @@ export const SendMessageFlow = async (
     let message;
 
     const templateButtons = [
-      {index: 1, urlButton: {displayText: '⭐ Star Baileys on GitHub!', url: 'https://github.com/adiwajshing/Baileys'}},
-      {index: 2, callButton: {displayText: 'Call me!+1 (234) 5678-901'}},
-      {index: 3, quickReplyButton: {displayText: 'This is a reply, just like normal buttons!', id: 'id-like-buttons-message'}},
-  ]
-    
+      {
+        index: 1,
+        urlButton: {
+          displayText: "⭐ Star Baileys on GitHub!",
+          url: "https://github.com/adiwajshing/Baileys"
+        }
+      },
+      { index: 2, callButton: { displayText: "Call me!+1 (234) 5678-901" } },
+      {
+        index: 3,
+        quickReplyButton: {
+          displayText: "This is a reply, just like normal buttons!",
+          id: "id-like-buttons-message"
+        }
+      }
+    ];
+
     const body = `\u200e${messageData.body}`;
-    message = await wbot.sendMessage(chatId, { text: body, templateButtons: templateButtons });
-    
+    message = await wbot.sendMessage(chatId, {
+      text: body,
+      //@ts-ignore
+      templateButtons: templateButtons
+    });
 
     return message;
   } catch (err: any) {

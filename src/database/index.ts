@@ -38,6 +38,7 @@ import FilesOptions from "../models/FilesOptions";
 import Prompt from "../models/Prompt";
 import QueueIntegrations from "../models/QueueIntegrations";
 import { FlowDefaultModel } from "../models/FlowDefault";
+import { FlowPhraseModel } from "../models/FlowPhrases";
 import { FlowBuilderModel } from "../models/FlowBuilder";
 import { FlowAudioModel } from "../models/FlowAudio";
 import { FlowCampaignModel } from "../models/FlowCampaign";
@@ -91,6 +92,7 @@ const models = [
   Prompt,
   QueueIntegrations,
   FlowDefaultModel,
+  FlowPhraseModel,
   FlowBuilderModel,
   FlowAudioModel,
   FlowCampaignModel,
