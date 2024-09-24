@@ -34,7 +34,7 @@ const FlowsDefaultGetDataService = async ({
     rows.forEach(flow => {
       flowResult.push(flow.toJSON());
     });
-
+    console.log(flowPhrase)
     return {
       flow: flowResult[0],
       flowPhrase

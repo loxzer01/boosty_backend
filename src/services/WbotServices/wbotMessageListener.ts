@@ -1893,6 +1893,17 @@ const flowBuilderQueue = async (
   );
 };
 
+const someText = (text: string, textArray: string[]) => {
+  console.log(text);
+  console.log(textArray);
+  for (let c of textArray) {
+    if (text.includes(c)) {
+      return true;
+    }
+  }
+  return false;
+};
+
 const flowbuilderIntegration = async (
   msg: proto.IWebMessageInfo,
   wbot: Session,
@@ -1901,7 +1912,8 @@ const flowbuilderIntegration = async (
   ticket: Ticket,
   contact: Contact,
   isFirstMsg?: Ticket,
-  isTranfered?: boolean
+  isTranfered?: boolean,
+  _message?: string
 ) => {
   const io = getIO();
   const quotedMsg = await verifyQuotedMessage(msg);
@@ -1930,6 +1942,8 @@ const flowbuilderIntegration = async (
   await CreateMessageService({ messageData, companyId: ticket.companyId });
 
   */
+
+  console.log(1909, "flowbuilderIntegration");
 
   if (!msg.key.fromMe && ticket.status === "closed") {
     console.log("===== CHANGE =====");
@@ -1960,68 +1974,66 @@ const flowbuilderIntegration = async (
     });
   }
 
-  console.log(1909, "flowbuilderIntegration");
-
-  const phrases = await FlowPhraseModel.findAll({
+  const phrase = await FlowPhraseModel.findAll({
     where: {
       companyId: ticket.companyId
     }
   });
+  if (!(phrase.length === 0)) {
+    console.log("entro");
+    const messages = phrase.map(item => {
+      const phraseArray = item.phrase.toLowerCase().split(",");
+      return {
+        phrase: item.phrase,
+        phraseId: item.phraseId,
+        id: item.id,
+        phraseArray
+      };
+    });
 
-  const messages = phrases.map(item => {
-    const phraseArray = item.phrase.toLowerCase().split(",");
-    return {
-      ...item,
-      phraseArray
-    };
-  });
+    const message2 = _message.toLowerCase();
+    for (let phrase of messages) {
+      let bool = someText(message2, phrase.phraseArray);
+      console.log(bool);
+      console.log(phrase?.phraseId);
+      if (bool) {
+        const flow2 = await FlowBuilderModel.findOne({
+          where: {
+            id: phrase.phraseId
+          }
+        });
+        console.log(flow2);
 
-  const message = msg?.message?.conversation?.toLowerCase();
+        const nodes: INodes[] = flow2.flow["nodes"];
+        const connections: IConnections[] = flow2.flow["connections"];
 
-  for (let phrase of messages) {
-    let bool = false;
-    for (let item of phrase.phraseArray) {
-      if (message.includes(item)) {
-        bool = true;
+        const mountDataContact = {
+          number: contact.number,
+          name: contact.name,
+          email: contact.email
+        };
+        await ActionsWebhookService(
+          phrase.phraseId,
+          ticket.companyId,
+          nodes,
+          connections,
+          nodes[0].id,
+          null,
+          "",
+          "",
+          null,
+          ticket.id,
+          mountDataContact
+        );
         break;
       }
     }
-    if (bool) {
-      const flow = await FlowBuilderModel.findOne({
-        where: {
-          id: phrase.phraseId
-        }
-      });
-      const nodes: INodes[] = flow.flow["nodes"];
-      const connections: IConnections[] = flow.flow["connections"];
-
-      const mountDataContact = {
-        number: contact.number,
-        name: contact.name,
-        email: contact.email
-      };
-      await ActionsWebhookService(
-        phrase.phraseId,
-        ticket.companyId,
-        nodes,
-        connections,
-        flow.flow["nodes"][0].id,
-        null,
-        "",
-        "",
-        null,
-        ticket.id,
-        mountDataContact
-      );
-      break;
-    }
   }
-
   if (msg.key.fromMe) {
     return;
   }
 
-  if (!isFirstMsg || !phrases) {
+  if (!isFirstMsg && (phrase.length === 0)) {
     console.log({ isFirstMsg });
 
     const flowUse = await FlowDefaultModel.findOne({
@@ -2092,7 +2104,7 @@ const flowbuilderIntegration = async (
   );
   const seisHorasEmMilissegundos = 1000;
 
-  if (diferencaEmMilissegundos >= seisHorasEmMilissegundos) {
+  if (diferencaEmMilissegundos >= seisHorasEmMilissegundos && (phrase.length === 0)) {
     console.log("2427", "handleMessageIntegration");
 
     const flowUse = await FlowDefaultModel.findOne({
@@ -2572,9 +2584,9 @@ const handleMessage = async (
       !ticket.isGroup &&
       !ticket.queue &&
       !ticket.user &&
-      !ticket.flowStopped &&
+      // !ticket.flowStopped &&
       !ticket.flowWebhook &&
-      // ticket.isBot &&
+      // //ticket.isBot &&
       !isNil(whatsapp.integrationId) &&
       !ticket.useIntegration
     ) {
@@ -2582,7 +2594,6 @@ const handleMessage = async (
         whatsapp.integrationId,
         companyId
       );
-
       console.log("flowbuilder");
       await flowbuilderIntegration(
         msg,
@@ -2591,7 +2602,9 @@ const handleMessage = async (
         integrations,
         ticket,
         contact,
-        isFirstMsg
+        isFirstMsg,
+        false,
+        bodyMessage
       );
     }
 

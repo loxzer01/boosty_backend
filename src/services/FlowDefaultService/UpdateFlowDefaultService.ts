@@ -29,39 +29,18 @@ const UpdateFlowDefaultService = async ({
       }
     });
 
-    if (
-      flowPhrase.length === 0 ||
-      flowPhrase.every(item => item.id === null || !item.id)
-    ) {
+    for (let item of flowPhrase) {
       await FlowPhraseModel.destroy({
         where: {
           companyId
         }
       });
-    }
-
-    for (let item of flowPhrase) {
-      if (item.id) {
-        await FlowPhraseModel.update(
-          {
-            phrase: item.phrase,
-            phraseId: item.phraseId
-          },
-          {
-            where: {
-              companyId,
-              id: item.id
-            }
-          }
-        );
-      } else {
-        await FlowPhraseModel.create({
-          phrase: item.phrase,
-          phraseId: item.phraseId,
-          userId: flowDefault.userId,
-          companyId: flowDefault.companyId
-        });
-      }
+      await FlowPhraseModel.create({
+        phrase: item.phrase,
+        phraseId: item.phraseId,
+        userId: flowDefault.userId,
+        companyId: flowDefault.companyId
+      });
     }
     const flow = await FlowDefaultModel.update(
       { flowIdWelcome, flowIdNotPhrase: flowIdPhrase },

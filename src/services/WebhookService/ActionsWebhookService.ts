@@ -433,13 +433,16 @@ export const ActionsWebhookService = async (
 
     if (nodeSelected.type === "menu") {
       if (pressKey) {
-
-        const filterOne = connectStatic.filter(confil => confil.source === next)
-        const filterTwo = filterOne.filter(filt2 => filt2.sourceHandle === "a" + pressKey)
-        if(filterTwo.length > 0){
-          execFn = filterTwo[0].target
+        const filterOne = connectStatic.filter(
+          confil => confil.source === next
+        );
+        const filterTwo = filterOne.filter(
+          filt2 => filt2.sourceHandle === "a" + pressKey
+        );
+        if (filterTwo.length > 0) {
+          execFn = filterTwo[0].target;
         } else {
-          execFn = undefined
+          execFn = undefined;
         }
         // execFn =
         //   connectStatic

@@ -21,7 +21,7 @@ module.exports = {
         type: DataTypes.STRING,
         allowNull: true
       },
-      phraseid: {
+      phraseId: {
         type: DataTypes.INTEGER,
         allowNull: true
       },
