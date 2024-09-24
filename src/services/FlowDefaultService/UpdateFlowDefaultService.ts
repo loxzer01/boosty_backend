@@ -23,17 +23,22 @@ const UpdateFlowDefaultService = async ({
   flowPhrase
 }: Request): Promise<String> => {
   try {
-    const flow = await FlowDefaultModel.update(
-      { flowIdWelcome, flowIdNotPhrase: flowIdPhrase },
-      {
-        where: { companyId }
-      }
-    );
     const flowDefault = await FlowDefaultModel.findOne({
       where: {
         companyId
       }
     });
+
+    if (
+      flowPhrase.length === 0 ||
+      flowPhrase.every(item => item.id === null || !item.id)
+    ) {
+      await FlowPhraseModel.destroy({
+        where: {
+          companyId
+        }
+      });
+    }
 
     for (let item of flowPhrase) {
       if (item.id) {
@@ -58,13 +63,12 @@ const UpdateFlowDefaultService = async ({
         });
       }
     }
-    if (flowPhrase.length === 0) {
-      await FlowPhraseModel.destroy({
-        where: {
-          companyId
-        }
-      });
-    }
+    const flow = await FlowDefaultModel.update(
+      { flowIdWelcome, flowIdNotPhrase: flowIdPhrase },
+      {
+        where: { companyId }
+      }
+    );
 
     return "ok";
   } catch (error) {
