@@ -13,10 +13,10 @@ module.exports = {
   username: process.env.DB_USER,
   password: process.env.DB_PASS,
   logging: process.env.DB_DEBUG === "true",
-  dialectOptions:{
-    ssl: {
-      require: true, // Asegura que SSL esté habilitado
-      rejectUnauthorized: false // Permite aceptar certificados sin firmar (puedes cambiarlo según tu entorno)
-    }
-  }
+  // dialectOptions:{
+  //   ssl: {
+  //     require: true, // Asegura que SSL esté habilitado
+  //     rejectUnauthorized: false // Permite aceptar certificados sin firmar (puedes cambiarlo según tu entorno)
+  //   }
+  // }
 };
