@@ -29,12 +29,12 @@ const UpdateFlowDefaultService = async ({
       }
     });
 
+    await FlowPhraseModel.destroy({
+      where: {
+        companyId
+      }
+    });
     for (let item of flowPhrase) {
-      await FlowPhraseModel.destroy({
-        where: {
-          companyId
-        }
-      });
       await FlowPhraseModel.create({
         phrase: item.phrase,
         phraseId: item.phraseId,
