@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx sequelize db:migrate && tsc",
+    "build": "tsc",
     "start": "node dist/server.js",
     "dev": "nodemon dist/server.js",
     "dev:ts": "ts-node-dev --respawn --transpile-only src/server.ts",
