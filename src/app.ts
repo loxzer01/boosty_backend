@@ -28,7 +28,8 @@ app.use(bodyParser.json({ limit: '10mb' }));
 
 app.use(
   cors({
-    origin: "*"
+    credentials: true,
+    origin: [process.env.FRONTEND_URL]
   })
 );
 app.use(cookieParser());
