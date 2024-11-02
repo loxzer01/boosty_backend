@@ -4,7 +4,7 @@ import { getIO } from "../libs/socket";
 import CheckSettingsHelper from "../helpers/CheckSettings";
 import AppError from "../errors/AppError";
 
-import CreateUserService from "../services/UserServices/CreateUserService";
+import CreateUserService, { ValidateEmailService } from "../services/UserServices/CreateUserService";
 import ListUsersService from "../services/UserServices/ListUsersService";
 import UpdateUserService from "../services/UserServices/UpdateUserService";
 import ShowUserService from "../services/UserServices/ShowUserService";
@@ -79,13 +79,13 @@ export const store = async (req: Request, res: Response): Promise<Response> => {
 	allTicket
   });
 
-  const io = getIO();
-  io.to(`company-${userCompanyId}-mainchannel`).emit(`company-${userCompanyId}-user`, {
-    action: "create",
-    user
-  });
+  // const io = getIO();
+  // io.to(`company-${userCompanyId}-mainchannel`).emit(`company-${userCompanyId}-user`, {
+  //   action: "create",
+  //   user
+  // });
 
-  return res.status(200).json(user);
+  return res.status(200);
 };
 
 export const show = async (req: Request, res: Response): Promise<Response> => {
@@ -156,3 +156,12 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
 
   return res.status(200).json(users);
 };
+
+export const validateEmail = async (req: Request, res: Response): Promise<Response> => {
+  const { email,token } = req.query as { email: string, token: string };
+
+  const user = await ValidateEmailService(email, token);
+
+  return res.status(200).json(user);
+}
+

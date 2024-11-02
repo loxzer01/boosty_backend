@@ -1,10 +1,12 @@
 import * as Yup from "yup";
+import { hash } from "bcryptjs";
 
 import AppError from "../../errors/AppError";
 import { SerializeUser } from "../../helpers/SerializeUser";
 import User from "../../models/User";
 import Plan from "../../models/Plan";
 import Company from "../../models/Company";
+import { get, set } from "../../libs/cache";
 
 interface Request {
   email: string;
@@ -82,8 +84,9 @@ const CreateUserService = async ({
     throw new AppError(err.message);
   }
 
-  const user = await User.create(
-    {
+  const userRedis = {
+    token: hash(email, 8),
+    data: {
       email,
       password,
       name,
@@ -92,16 +95,57 @@ const CreateUserService = async ({
       whatsappId: whatsappId || null,
 	  allTicket
     },
-    { include: ["queues", "company"] }
+    queueIds,
+    config: { include: ["queues", "company"] }
+  }
+  set(`email:${email}`, JSON.stringify(userRedis));
+  
+
+  // const user = await User.create(
+  //   {
+  //     email,
+  //     password,
+  //     name,
+  //     companyId,
+  //     profile,
+  //     whatsappId: whatsappId || null,
+	//   allTicket
+  //   },
+  //   { include: ["queues", "company"] }
+  // );
+
+  // await user.$set("queues", queueIds);
+
+  // await user.reload();
+
+  // const serializedUser = SerializeUser(user);
+
+  // return serializedUser;
+  return;
+};
+
+export const ValidateEmailService = async (email: string, token: string) => {
+  const userData = get(`email:${email}`);
+  if(!userData) throw new AppError('ERR_NO_USER_FOUND');
+
+  const userJson = JSON.parse(userData);
+
+  if(userJson.token !== token) throw new AppError('ERR_INVALID_TOKEN');
+
+    const user = await User.create(
+      userData.data,
+      userData.config
   );
 
-  await user.$set("queues", queueIds);
+  await user.$set("queues", userData.queueIds);
 
   await user.reload();
 
   const serializedUser = SerializeUser(user);
 
   return serializedUser;
-};
+}
+
+
 
 export default CreateUserService;
