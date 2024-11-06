@@ -12,6 +12,6 @@ authRoutes.post("/refresh_token", SessionController.update);
 authRoutes.delete("/logout", isAuth, SessionController.remove);
 authRoutes.get("/me", isAuth, SessionController.me);
 
-authRoutes.get("/validate-email", UserController.validateEmail);
+authRoutes.get("/validate_email", UserController.validateEmail);
 
 export default authRoutes;

@@ -11,6 +11,7 @@ import ShowUserService from "../services/UserServices/ShowUserService";
 import DeleteUserService from "../services/UserServices/DeleteUserService";
 import SimpleListService from "../services/UserServices/SimpleListService";
 import User from "../models/User";
+import { del } from "../libs/cache";
 
 type IndexQuery = {
   searchParam: string;
@@ -157,11 +158,17 @@ export const list = async (req: Request, res: Response): Promise<Response> => {
   return res.status(200).json(users);
 };
 
-export const validateEmail = async (req: Request, res: Response): Promise<Response> => {
-  const { email,token } = req.query as { email: string, token: string };
+export const validateEmail = async (req: Request, res: Response) => {
+  const { e, t } = req.query as { e: string, t: string };
+  const email = atob(e);
+  const token = atob(t);
 
-  const user = await ValidateEmailService(email, token);
 
-  return res.status(200).json(user);
+  // console.log(email, token);
+  await ValidateEmailService(email, token);
+
+  del(`${email}-boosfy`);
+  //redireccionar para otra url
+  return res.redirect(`${process.env.FRONTEND_URL}/login?v=validated`);
 }
 
